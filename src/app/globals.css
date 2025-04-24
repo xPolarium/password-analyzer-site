@@ -41,6 +41,11 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--color-very-strong: oklch(0.82 0.1381 206);
+	--color-strong: oklch(0.75 0.2417 144);
+	--color-medium: oklch(0.87 0.1431 85.76);
+	--color-weak: oklch(0.75 0.1677 54);
+	--color-very-weak: oklch(0.7 0.2417 24.35);
 }
 
 :root {

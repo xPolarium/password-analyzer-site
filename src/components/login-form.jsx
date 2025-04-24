@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +12,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { useState } from "react";
+
 export function LoginForm({ className, ...props }) {
+	const [password, setPassword] = useState("");
+	const [result, setResult] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
+
+	const checkPassStrength = async () => {
+		if (!password.trim()) return;
+
+		setLoading(true);
+		setError(null);
+		setResult(null);
+
+		try {
+			const res = await fetch(
+				`http://127.0.0.1:5328/check?password=${password}`
+			);
+			if (!res.ok) throw new Error(`Error ${res.status}`);
+
+			const data = await res.json();
+			setResult(data);
+		} catch (err) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const COLORS = [
+		"bg-very-weak",
+		"bg-weak",
+		"bg-medium",
+		"bg-strong",
+		"bg-very-strong",
+	];
+
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
 			<Card>
@@ -23,36 +62,60 @@ export function LoginForm({ className, ...props }) {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form>
-						<div className="grid gap-6">
-							<div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-								<span className="bg-card text-base relative z-10 px-2">
-									Enter a password
-								</span>
-							</div>
-							<div className="grid gap-6">
-								<div className="grid gap-3">
-									<div className="flex items-center">
-										<Label htmlFor="password"></Label>
-									</div>
-									<Input
-										id="password"
-										type="password"
-										required
-									/>
-								</div>
-								<Button type="submit" className="w-full">
-									Check strength
-								</Button>
-							</div>
+					<div className="grid gap-6">
+						<div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+							<span className="bg-card text-base relative z-10 px-2">
+								Enter a password
+							</span>
 						</div>
-					</form>
+						<div className="grid gap-6">
+							<div className="grid gap-3">
+								<div className="flex items-center">
+									<Label htmlFor="password"></Label>
+								</div>
+								<Input
+									type="text"
+									placeholder="Enter your password"
+									value={password}
+									onChange={(e) =>
+										setPassword(e.target.value)
+									}
+								/>
+							</div>
+							<Button
+								onClick={checkPassStrength}
+								className="w-full"
+							>
+								{loading ? "Checking..." : "Check strength"}
+							</Button>
+							{error && (
+								<p className="text-red-500 mt-2">
+									Error: {error}
+								</p>
+							)}
+
+							{result && (
+								<ul className="flex flex-col gap-2">
+									{Object.entries(result).map(
+										([key, value]) => (
+											<ul className="">
+												<Button
+													className={cn(
+														"w-full pointer-events-none",
+														COLORS[value.predicted]
+													)}
+												>
+													{key} : {value.predicted}
+												</Button>
+											</ul>
+										)
+									)}
+								</ul>
+							)}
+						</div>
+					</div>
 				</CardContent>
 			</Card>
-			<div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-				Our service ensures end-to-end encryption of used passwords,
-				ensuring our users from exposing their private information.
-			</div>
 		</div>
 	);
 }
