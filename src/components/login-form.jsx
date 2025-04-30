@@ -33,7 +33,9 @@ export function LoginForm({ className, ...props }) {
 		setResult(null);
 
 		try {
-			const res = await fetch(`${apiUrl}/check?password=${password}`);
+			const res = await fetch(`${apiUrl}/check?password=${password}`, {
+				mode: "no-cors",
+			});
 			if (!res.ok) throw new Error(`Error ${res.status}`);
 
 			const data = await res.json();
