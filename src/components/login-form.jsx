@@ -14,6 +14,11 @@ import { Label } from "@/components/ui/label";
 
 import { useState } from "react";
 
+const apiUrl =
+	process.env.NODE_ENV !== "production"
+		? "http://localhost:5328"
+		: "https://imaginative-sprinkles-8419a0.netlify.app";
+
 export function LoginForm({ className, ...props }) {
 	const [password, setPassword] = useState("");
 	const [result, setResult] = useState(null);
@@ -28,9 +33,7 @@ export function LoginForm({ className, ...props }) {
 		setResult(null);
 
 		try {
-			const res = await fetch(
-				`http://127.0.0.1:5328/check?password=${password}`
-			);
+			const res = await fetch(`${apiUrl}/check?password=${password}`);
 			if (!res.ok) throw new Error(`Error ${res.status}`);
 
 			const data = await res.json();
